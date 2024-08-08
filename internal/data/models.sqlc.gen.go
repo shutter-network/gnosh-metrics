@@ -121,3 +121,21 @@ type TransactionSubmittedEvent struct {
 	CreatedAt            pgtype.Timestamptz
 	UpdatedAt            pgtype.Timestamptz
 }
+
+type ValidatorRegistrationMessage struct {
+	ID               int32
+	Version          int64
+	ChainID          int64
+	ValidatorIndex   int64
+	Nonce            int64
+	IsRegisteration  bool
+	Signature        []byte
+	EventBlockNumber int64
+	CreatedAt        pgtype.Timestamptz
+	UpdatedAt        pgtype.Timestamptz
+}
+
+type ValidatorRegistryEventsSyncedUntil struct {
+	EnforceOneRow bool
+	BlockNumber   int64
+}

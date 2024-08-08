@@ -16,6 +16,7 @@ type TxMapperMemory struct {
 	TransactionSubmittedEvents          map[string]*data.TransactionSubmittedEvent
 	DecryptionKeyShare                  map[string]*data.DecryptionKeyShare
 	Block                               map[string]*data.Block
+	ValidatoryRegistry                  map[string]*data.ValidatorRegistrationMessage
 	ethClient                           *ethclient.Client
 
 	mutex sync.Mutex
@@ -30,6 +31,7 @@ func NewTxMapperMemory(ethClient *ethclient.Client) TxMapper {
 		DecryptionKeyShare:                  make(map[string]*data.DecryptionKeyShare),
 		Block:                               make(map[string]*data.Block),
 		ethClient:                           ethClient,
+		ValidatoryRegistry:                  make(map[string]*data.ValidatorRegistrationMessage),
 		mutex:                               sync.Mutex{},
 	}
 }
@@ -96,6 +98,20 @@ func (tm *TxMapperMemory) AddBlock(
 	defer tm.mutex.Unlock()
 
 	tm.Block[string(b.BlockHash)] = b
+	return nil
+}
+
+func (tm *TxMapperMemory) QueryBlockNumberFromValidatorRegistryEventsSyncedUntil(ctx context.Context) (int64, error) {
+	var maxBlock int64
+	for _, data := range tm.ValidatoryRegistry {
+		if data.EventBlockNumber > maxBlock {
+			maxBlock = data.EventBlockNumber
+		}
+	}
+	return maxBlock, nil
+}
+
+func (tm *TxMapperMemory) AddValidatorRegistryEvent(ctx context.Context, vr *data.ValidatorRegistrationMessage) error {
 	return nil
 }
 
